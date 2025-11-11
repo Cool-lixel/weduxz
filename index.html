@@ -3,181 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sando-Ai Bot Control Panel</title>
+    <title>HAIL TO THE KING</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Tambahan CSS untuk menyembunyikan/menampilkan elemen */
-        .media-input-group {
-            display: none; /* Default hidden */
-            margin-top: 10px;
-        }
-        .media-input-group.active {
-            display: block;
-        }
-        .lungzz-controls {
+        /* CSS tambahan untuk transisi dan tampilan awal */
+        #login-screen {
             display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
         }
-        .lungzz-list-item {
+        #main-control-panel {
+            display: none; /* Sembunyikan panel utama secara default */
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #main-control-panel.active {
+            display: block;
+            opacity: 1;
+        }
+        .section-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #5a5a7a;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #4a4a6a;
+            padding-bottom: 10px;
         }
-        .lungzz-list-item:last-child {
-            border-bottom: none;
+        .section-header h2 {
+            margin: 0;
+            color: #00bcd4;
         }
-        .lungzz-list-item button {
-            background-color: #f44336; /* Red for delete */
-            padding: 5px 10px;
-            font-size: 0.8rem;
-        }
-        .lungzz-list-item button:hover {
-            background-color: #d32f2f;
-        }
-        select {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #5a5a7a;
+        .toggle-button {
+            background-color: #00bcd4;
+            color: white;
+            border: none;
+            padding: 8px 12px;
             border-radius: 5px;
-            background-color: #4a4a6a;
-            color: #e0e0e0;
-            box-sizing: border-box;
-            font-size: 1rem;
-            -webkit-appearance: none; /* Remove default arrow on some browsers */
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23e0e0e0%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-5.4H18.2c-4.9%200-9.4%201.8-13.2%205.4A17.6%2017.6%200%200%200%200%2082.6c0%204.9%201.8%209.4%205.4%2013.2l132.6%20132.6c3.8%203.8%208.3%205.4%2013.2%205.4s9.4-1.8%2013.2-5.4L287%2095.8c3.8-3.8%205.4-8.3%205.4-13.2%200-4.9-1.8-9.4-5.4-13.2z%22%2F%3E%3C%2Fsvg%3E');
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .toggle-button:hover {
+            background-color: #0097a7;
+        }
+        .section-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        .section-content.active {
+            max-height: 500px; /* Adjust as needed for content height */
+            transition: max-height 0.7s ease-in;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Kontrol Bot Sando-Ai</h1>
-
-        <!-- Bagian Informasi Bot, Ubah Nama, Ubah Bio tetap sama -->
-        <section id="bot-info-section">
-            <h2>Informasi Bot</h2>
-            <form id="getBotInfoForm">
-                <input type="text" id="botTokenInfo" placeholder="Token Bot Telegram" required>
-                <button type="submit">Dapatkan Info Bot</button>
+    <div id="login-screen">
+        <div class="login-card">
+            <h1>Selamat Datang, Dalang.</h1>
+            <p>Masukkan Token Bot Telegram-mu untuk mengakses Command Center.</p>
+            <form id="botTokenLoginForm">
+                <input type="password" id="masterBotTokenInput" placeholder="Token Bot Telegram Rahasia" required autocomplete="off">
+                <button type="submit">Akses Sistem</button>
             </form>
-            <div id="botInfoResult" class="result-box">
-                <p><strong>ID Bot:</strong> <span id="displayBotId"></span></p>
-                <p><strong>Username:</strong> <span id="displayBotUsername"></span></p>
-                <p><strong>Nama:</strong> <span id="displayBotName"></span></p>
+            <p id="loginStatus" class="status-message"></p>
+        </div>
+    </div>
+
+    <div id="main-control-panel" class="container">
+        <header>
+            <h1>Sando-Ai Command Center <span id="currentBotUsernameDisplay" class="bot-username"></span></h1>
+            <p class="tagline">Manipulasi digital di ujung jarimu.</p>
+            <button id="logoutButton" class="logout-button">Keluar</button>
+        </header>
+
+        <section id="bot-info-section">
+            <div class="section-header">
+                <h2>Informasi Bot</h2>
+                <button class="toggle-button" data-target="bot-info-content">▼</button>
+            </div>
+            <div id="bot-info-content" class="section-content active">
+                <div id="botInfoResult" class="result-box">
+                    <p><strong>ID Bot:</strong> <span id="displayBotId"></span></p>
+                    <p><strong>Username:</strong> <span id="displayBotUsername"></span></p>
+                    <p><strong>Nama:</strong> <span id="displayBotName"></span></p>
+                </div>
             </div>
         </section>
 
         <section id="change-name-section">
-            <h2>Ubah Nama Bot</h2>
-            <form id="changeBotNameForm">
-                <input type="text" id="botTokenName" placeholder="Token Bot Telegram" required>
-                <input type="text" id="newBotName" placeholder="Nama Bot Baru" required>
-                <button type="submit">Ubah Nama</button>
-            </form>
-            <p id="changeNameStatus" class="status-message"></p>
-        </section>
-
-        <section id="change-bio-section">
-            <h2>Ubah Bio Bot</h2>
-            <form id="changeBotBioForm">
-                <input type="text" id="botTokenBio" placeholder="Token Bot Telegram" required>
-                <textarea id="newBotBio" placeholder="Bio Bot Baru (deskripsi panjang)"></textarea>
-                <textarea id="newBotShortBio" placeholder="Bio Singkat Bot Baru"></textarea>
-                <button type="submit">Ubah Bio</button>
-            </form>
-            <p id="changeBioStatus" class="status-message"></p>
-        </section>
-
-        <!-- Bagian LUNGZZ baru -->
-        <section id="lungzz-section">
-            <h2>LUNGZZ (Kumpulan Teks Cepat)</h2>
-            <form id="addLungzzForm">
-                <input type="text" id="lungzzName" placeholder="Nama Teks Cepat (misal: Sapaan Awal)" required>
-                <textarea id="lungzzContent" placeholder="Isi Teks Cepat" required></textarea>
-                <button type="submit">Tambah LUNGZZ</button>
-            </form>
-            <div class="result-box">
-                <ul id="lungzzList">
-                    <!-- Daftar LUNGZZ akan dimuat di sini -->
-                </ul>
+            <div class="section-header">
+                <h2>Ubah Nama Bot</h2>
+                <button class="toggle-button" data-target="change-name-content">▼</button>
+            </div>
+            <div id="change-name-content" class="section-content">
+                <form id="changeBotNameForm">
+                    <input type="text" id="newBotName" placeholder="Nama Bot Baru" required>
+                    <button type="submit">Ubah Nama</button>
+                </form>
+                <p id="changeNameStatus" class="status-message"></p>
             </div>
         </section>
 
-
-        <!-- Bagian Kirim Pesan yang diperbarui -->
-        <section id="send-message-section">
-            <h2>Kirim Pesan ke Target</h2>
-            <form id="sendMessageForm">
-                <input type="text" id="botTokenMessage" placeholder="Token Bot Telegram" required>
-                <input type="text" id="targetId" placeholder="ID Target Pengguna" required>
-
-                <div class="message-type-selector">
-                    <h3>Tipe Pesan:</h3>
-                    <label><input type="radio" name="messageType" value="text" checked> Teks</label>
-                    <label><input type="radio" name="messageType" value="photo"> Gambar</label>
-                    <label><input type="radio" name="messageType" value="video"> Video</label>
-                </div>
-
-                <div id="textMessageGroup" class="media-input-group active">
-                    <div class="lungzz-selector-group">
-                        <label for="selectLungzzText">Pilih LUNGZZ Teks:</label>
-                        <select id="selectLungzzText">
-                            <option value="">-- Pilih Teks Cepat --</option>
-                            <!-- Opsi LUNGZZ akan dimuat di sini -->
-                        </select>
-                        <button type="button" id="useLungzzTextButton">Gunakan LUNGZZ</button>
-                    </div>
-                    <textarea id="messageText" placeholder="Pesan teks yang akan dikirim" required></textarea>
-                </div>
-
-                <div id="photoMessageGroup" class="media-input-group">
-                    <input type="text" id="photoUrl" placeholder="URL Gambar (misal: https://example.com/image.jpg)">
-                    <div class="lungzz-selector-group">
-                        <label for="selectLungzzPhotoCaption">Pilih LUNGZZ Caption:</label>
-                        <select id="selectLungzzPhotoCaption">
-                            <option value="">-- Pilih Teks Cepat --</option>
-                        </select>
-                        <button type="button" id="useLungzzPhotoCaptionButton">Gunakan LUNGZZ</button>
-                    </div>
-                    <textarea id="photoCaption" placeholder="Caption Gambar (opsional)"></textarea>
-                </div>
-
-                <div id="videoMessageGroup" class="media-input-group">
-                    <input type="text" id="videoUrl" placeholder="URL Video (misal: https://example.com/video.mp4)">
-                    <div class="lungzz-selector-group">
-                        <label for="selectLungzzVideoCaption">Pilih LUNGZZ Caption:</label>
-                        <select id="selectLungzzVideoCaption">
-                            <option value="">-- Pilih Teks Cepat --</option>
-                        </select>
-                        <button type="button" id="useLungzzVideoCaptionButton">Gunakan LUNGZZ</button>
-                    </div>
-                    <textarea id="videoCaption" placeholder="Caption Video (opsional)"></textarea>
-                </div>
-
-                <button type="submit">Kirim Pesan</button>
-            </form>
-            <p id="sendMessageStatus" class="status-message"></p>
+        <section id="change-bio-section">
+            <div class="section-header">
+                <h2>Ubah Bio Bot</h2>
+                <button class="toggle-button" data-target="change-bio-content">▼</button>
+            </div>
+            <div id="change-bio-content" class="section-content">
+                <form id="changeBotBioForm">
+                    <textarea id="newBotBio" placeholder="Bio Bot Baru (deskripsi panjang)"></textarea>
+                    <textarea id="newBotShortBio" placeholder="Bio Singkat Bot Baru"></textarea>
+                    <button type="submit">Ubah Bio</button>
+                </form>
+                <p id="changeBioStatus" class="status-message"></p>
+            </div>
         </section>
 
-        <!-- Bagian Pengguna Terkumpul tetap sama -->
+        <section id="lungzz-section">
+            <div class="section-header">
+                <h2>LUNGZZ (Kumpulan Teks Cepat)</h2>
+                <button class="toggle-button" data-target="lungzz-content">▼</button>
+            </div>
+            <div id="lungzz-content" class="section-content">
+                <form id="addLungzzForm">
+                    <input type="text" id="lungzzName" placeholder="Nama Teks Cepat (misal: Sapaan Awal)" required>
+                    <textarea id="lungzzContent" placeholder="Isi Teks Cepat" required></textarea>
+                    <button type="submit">Tambah LUNGZZ</button>
+                </form>
+                <div class="result-box">
+                    <ul id="lungzzList">
+                        <!-- Daftar LUNGZZ akan dimuat di sini -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="send-message-section">
+            <div class="section-header">
+                <h2>Kirim Pesan ke Target</h2>
+                <button class="toggle-button" data-target="send-message-content">▼</button>
+            </div>
+            <div id="send-message-content" class="section-content">
+                <form id="sendMessageForm">
+                    <input type="text" id="targetId" placeholder="ID Target Pengguna" required>
+
+                    <div class="message-type-selector">
+                        <h3>Tipe Pesan:</h3>
+                        <label><input type="radio" name="messageType" value="text" checked> Teks</label>
+                        <label><input type="radio" name="messageType" value="photo"> Gambar</label>
+                        <label><input type="radio" name="messageType" value="video"> Video</label>
+                    </div>
+
+                    <div id="textMessageGroup" class="media-input-group active">
+                        <div class="lungzz-selector-group">
+                            <label for="selectLungzzText">Pilih LUNGZZ Teks:</label>
+                            <select id="selectLungzzText">
+                                <option value="">-- Pilih Teks Cepat --</option>
+                            </select>
+                            <button type="button" id="useLungzzTextButton">Gunakan LUNGZZ</button>
+                        </div>
+                        <textarea id="messageText" placeholder="Pesan teks yang akan dikirim" required></textarea>
+                    </div>
+
+                    <div id="photoMessageGroup" class="media-input-group">
+                        <input type="text" id="photoUrl" placeholder="URL Gambar (misal: https://example.com/image.jpg)">
+                        <div class="lungzz-selector-group">
+                            <label for="selectLungzzPhotoCaption">Pilih LUNGZZ Caption:</label>
+                            <select id="selectLungzzPhotoCaption">
+                                <option value="">-- Pilih Teks Cepat --</option>
+                            </select>
+                            <button type="button" id="useLungzzPhotoCaptionButton">Gunakan LUNGZZ</button>
+                        </div>
+                        <textarea id="photoCaption" placeholder="Caption Gambar (opsional)"></textarea>
+                    </div>
+
+                    <div id="videoMessageGroup" class="media-input-group">
+                        <input type="text" id="videoUrl" placeholder="URL Video (misal: https://example.com/video.mp4)">
+                        <div class="lungzz-selector-group">
+                            <label for="selectLungzzVideoCaption">Pilih LUNGZZ Caption:</label>
+                            <select id="selectLungzzVideoCaption">
+                                <option value="">-- Pilih Teks Cepat --</option>
+                            </select>
+                            <button type="button" id="useLungzzVideoCaptionButton">Gunakan LUNGZZ</button>
+                        </div>
+                        <textarea id="videoCaption" placeholder="Caption Video (opsional)"></textarea>
+                    </div>
+
+                    <button type="submit">Kirim Pesan</button>
+                </form>
+                <p id="sendMessageStatus" class="status-message"></p>
+            </div>
+        </section>
+
         <section id="collected-users-section">
-            <h2>Pengguna Terkumpul</h2>
-            <p>Untuk mengumpulkan ID pengguna secara otomatis, atur webhook bot-mu ke: <code id="webhookUrlDisplay"></code></p>
-            <button id="refreshUsersButton">Muat Ulang Daftar Pengguna</button>
-            <ul id="userList" class="result-box">
-                <!-- Daftar ID pengguna akan dimuat di sini -->
-            </ul>
+            <div class="section-header">
+                <h2>Pengguna Terkumpul</h2>
+                <button class="toggle-button" data-target="collected-users-content">▼</button>
+            </div>
+            <div id="collected-users-content" class="section-content">
+                <p>Untuk mengumpulkan ID pengguna secara otomatis, atur webhook bot-mu ke: <code id="webhookUrlDisplay"></code></p>
+                <button id="refreshUsersButton">Muat Ulang Daftar Pengguna</button>
+                <div class="result-box">
+                    <ul id="userList">
+                        <!-- Daftar ID pengguna akan dimuat di sini -->
+                    </ul>
+                </div>
+            </div>
         </section>
     </div>
 
     <script src="script.js"></script>
 </body>
-  </html>
+    </html>
